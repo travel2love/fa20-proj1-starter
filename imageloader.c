@@ -59,7 +59,10 @@ void writeData(Image *image)
 	int k = 0;
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
-		printf("%3d %3d %3d   ", (image_1+k)->R, (image_1+k)->G, (image_1+k)->B);
+			printf("%3d %3d %3d", (image_1+k)->R, (image_1+k)->G, (image_1+k)->B);
+			if((k+1)%cols != 0) {
+				printf("   ");
+			}
 			k++;
 		}
 		printf("\n");
