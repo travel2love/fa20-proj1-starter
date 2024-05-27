@@ -30,17 +30,16 @@ Image *readData(char *filename)
 	char name[20];
 	int cols = 0, rows = 0, number = 0;
 	fscanf(fp, "%s\n%d %d\n%d", name, &cols, &rows, &number);
-	Image *images = (Image *)malloc(sizeof(Color*)*rows*cols);
+	Image *images = (Image *)malloc(sizeof(Color*)*rows*cols + 2*sizeof(int));
+//	Image *images;
 	images->rows = rows;
 	images->cols = cols;
-	for(int i = 0; i < rows; i++){
-		for(int j = 0; j < cols; j++){
-			Color *colorptr, color;
-			colorptr = &color;
-			fscanf(fp, "%hhd %hhd %hhd", &color.R, &color.G, &color.B);
-			images->image = &color;
+	Color *colorptr[cols*rows], color[cols*rows];
+	for(int i = 0; i < rows*cols; i++) {
+			fscanf(fp, "%hhd %hhd %hhd", &color[i].R, &color[i].G, &color[i].B);
+			colorptr[i] = &color[i];
 		}
-	}
+	images->image = &colorptr;
 	return images;
 	fclose(fp);
 }
@@ -49,7 +48,22 @@ Image *readData(char *filename)
 void writeData(Image *image)
 {
 	//YOUR CODE HERE
-		
+	Image *images = image;
+	uint32_t cols = images->cols;
+	uint32_t rows = images->rows;
+	printf("P3\n");
+	printf("%d %d\n", cols, rows);
+	printf("255\n");
+	Color **image_0 = images->image, *colorptr[cols*rows], color[cols*rows];
+	Color *image_1 = *image_0;
+	int k = 0;
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+		printf("%3d %3d %3d   ", (image_1+k)->R, (image_1+k)->G, (image_1+k)->B);
+			k++;
+		}
+		printf("\n");
+	}
 }
 
 //Frees an image
