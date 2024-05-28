@@ -29,7 +29,8 @@ Color *evaluateOnePixel(Image *image, int row, int col)
 	int B = 0, image_col = image->cols;
 	int k = image_col*row + col;
 	B = (images_1+k)->B;
-	if(B << 7 == 0) {
+	B = B&1;
+	if(B == 0) {
 		color->R = 0;
 		color->G = 0;
 		color->B = 0;
@@ -65,6 +66,7 @@ Image *steganography(Image *image)
 			k += 1;
 		}
 	}
+	new_image->image = &new_colorptr;
 	return new_image;
 }
 
