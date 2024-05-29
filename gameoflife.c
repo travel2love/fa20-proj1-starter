@@ -23,7 +23,6 @@
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 {
 	//YOUR CODE HERE
-	Color *color = (Color*)malloc(sizeof(Color));
 	Image *images = image;
 	Color **images_0 = images->image;
 	Color *images_1 = *images_0;
@@ -32,7 +31,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	int k = image_col*row + col;
 	R = (images_1+k)->R, G = (images_1+k)->G, B = (images_1+k)->B;
 	Color neighbor[8];
-	Color color_new;
+	Color *color_new = (Color*)malloc(sizeof(Color));
 	//the first neighbor
 	k = image_col*(row - 1) + col - 1;
 	if(k >= 0) {
@@ -98,7 +97,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		neighbor[5].R = 0;
 		neighbor[5].G = 0;
 		neighbor[5].B = 0;
-	}
+	 }
 	//the seventh neighbor
 	k = image_col*(row + 1) + col;
 	if(k >= 0) {
@@ -128,18 +127,18 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	int R_sum[8] = {}, G_sum[8] = {}, B_sum[8] = {};
 	for(int i = 0; i < 8; i++) {
 		for(int j = 0; j < 8; j++) {
-			R_sum[i] = (neighbor[j].R >> i)&1 + R_sum[i];
-			G_sum[i] = (neighbor[j].G >> i)&1 + G_sum[i];
-			B_sum[i] = (neighbor[j].B >> i)&1 + B_sum[i];
+			R_sum[i] = ((neighbor[j].R >> i)&1) + R_sum[i];
+			G_sum[i] = ((neighbor[j].G >> i)&1) + G_sum[i];
+			B_sum[i] = ((neighbor[j].B >> i)&1) + B_sum[i];
 		}
 	}
 	//R
 	for(int i = 0; i < 8; i++) {
-		if((R>>i)&1 == 1 && ((rule>>(9+R_sum[i])&1) == 1)) {
-			R_new = R_new | 0x0001;
+		if(((R>>i)&1) == 1 && ((rule>>(9+R_sum[i])&1) == 1)) {
+			R_new = R_new | (2^i);
 			}
-		else if((R>>i)&1 == 0 && ((rule>>R_sum[i])&1 == 1)) {
-			R_new = R_new | 0x0001;
+		else if(((R>>i)&1) == 0 && (((rule>>R_sum[i])&1) == 1)) {
+			R_new = R_new | (2^i);
 			}
 		else {
 			R_new = R_new | 0x0000;
@@ -147,11 +146,11 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		}
 	//G
 	for(int i = 0; i < 8; i++) {
-		if((G>>i)&1 == 1 && ((rule>>(9+G_sum[i])&1) == 1)) {
-			G_new = G_new | 0x0001;
+		if(((G>>i)&1) == 1 && ((rule>>(9+G_sum[i])&1) == 1)) {
+			G_new = G_new | (2^i);
 			}
-		else if((G>>i)&1 == 0 && ((rule>>G_sum[i])&1 == 1)) {
-			G_new = G_new | 0x0001;
+		else if(((G>>i)&1) == 0 && (((rule>>G_sum[i])&1) == 1)) {
+			G_new = G_new | (2^i);
 			}
 		else {
 			G_new = G_new | 0x0000;
@@ -159,21 +158,21 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		}
 	//B
 	for(int i = 0; i < 8; i++) {
-		if((B>>i)&1 == 1 && ((rule>>(9+B_sum[i])&1) == 1)) {
-			B_new = B_new | 0x0001;
+		if(((B>>i)&1) == 1 && ((rule>>(9+B_sum[i])&1) == 1)) {
+			B_new = B_new | (2^i);
 			}
-		else if((B>>i)&1 == 0 && ((rule>>B_sum[i])&1 == 1)) {
-			B_new = B_new | 0x0001;
+		else if(((B>>i)&1) == 0 && (((rule>>B_sum[i])&1) == 1)) {
+			B_new = B_new | (2^i);
 			}
 		else {
 			B_new = B_new | 0x0000;
 			}
 		}
 	//set new color
-	color_new.R = R_new;
-	color_new.G = G_new;
-	color_new.B = B_new;
-	return &color_new;
+	color_new->R = R_new;
+	color_new->G = G_new;
+	color_new->B = B_new;
+	return color_new;
 }
 
 //The main body of Life; given an image and a rule, computes one iteration of the Game of Life.
@@ -230,7 +229,7 @@ int main(int argc, char **argv)
 	}
 	Image *image = readData(argv[1]);
 	char *example;
-	int num = strtol(argv[2], example, 32);
+	int num = strtol(argv[2], &example, 0);
 	Image *image_new = life(image, num);
 	writeData(image_new);
 	freeImage(image);
