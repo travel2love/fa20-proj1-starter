@@ -135,10 +135,18 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	//R
 	for(int i = 0; i < 8; i++) {
 		if(((R>>i)&1) == 1 && ((rule>>(9+R_sum[i])&1) == 1)) {
-			R_new = R_new | (2^i);
+			int p = 1, q = 2;
+			for(int j = 0; j < i; j++) {
+				p = p * q;
+			}
+			R_new = R_new | p;
 			}
 		else if(((R>>i)&1) == 0 && (((rule>>R_sum[i])&1) == 1)) {
-			R_new = R_new | (2^i);
+			int p = 1, q = 2;
+                        for(int j = 0; j < i; j++) {
+                                p = p * q;
+                        }
+			R_new = R_new | p;
 			}
 		else {
 			R_new = R_new | 0x0000;
@@ -147,10 +155,18 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	//G
 	for(int i = 0; i < 8; i++) {
 		if(((G>>i)&1) == 1 && ((rule>>(9+G_sum[i])&1) == 1)) {
-			G_new = G_new | (2^i);
+			int p = 1, q = 2;
+                        for(int j = 0; j < i; j++) {
+                                p = p * q;
+                        }
+			G_new = G_new | p;
 			}
 		else if(((G>>i)&1) == 0 && (((rule>>G_sum[i])&1) == 1)) {
-			G_new = G_new | (2^i);
+			int p = 1, q = 2;
+                        for(int j = 0; j < i; j++) {
+                                p = p * q;
+                        }
+			G_new = G_new | p;
 			}
 		else {
 			G_new = G_new | 0x0000;
@@ -159,10 +175,18 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	//B
 	for(int i = 0; i < 8; i++) {
 		if(((B>>i)&1) == 1 && ((rule>>(9+B_sum[i])&1) == 1)) {
-			B_new = B_new | (2^i);
+			int p = 1, q = 2;
+                        for(int j = 0; j < i; j++) {
+                                p = p * q;
+                        }
+			B_new = B_new | p;
 			}
 		else if(((B>>i)&1) == 0 && (((rule>>B_sum[i])&1) == 1)) {
-			B_new = B_new | (2^i);
+			int p = 1, q = 2;
+                        for(int j = 0; j < i; j++) {
+                                p = p * q;
+                        }
+			B_new = B_new | p;
 			}
 		else {
 			B_new = B_new | 0x0000;
