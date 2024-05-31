@@ -23,18 +23,23 @@
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 {
 	//YOUR CODE HERE
+	Color *color = (Color*)malloc(sizeof(Color));
 	Image *images = image;
 	Color **images_0 = images->image;
 	Color *images_1 = *images_0;
 	int R = 0, G = 0, B = 0;
-	int image_col = image->cols;
-	int k = image_col*row + col;
-	R = (images_1+k)->R, G = (images_1+k)->G, B = (images_1+k)->B;
+	int image_col = image->cols, image_row = image->rows;
+	int sum = image_col*image_row;
+	int k0 = image_col*row + col;
+	int k = 0;
+	R = (images_1+k0)->R, G = (images_1+k0)->G, B = (images_1+k0)->B;
+	color->R = R;
+	color->G = G;
 	Color neighbor[8];
 	Color *color_new = (Color*)malloc(sizeof(Color));
 	//the first neighbor
 	k = image_col*(row - 1) + col - 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[0].R = (images_1+k)->R;
 		neighbor[0].G = (images_1+k)->G;
 		neighbor[0].B = (images_1+k)->B;}
@@ -45,7 +50,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the second neighbor
 	k = image_col*(row - 1) + col;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[1].R = (images_1+k)->R;
 		neighbor[1].G = (images_1+k)->G;
 		neighbor[1].B = (images_1+k)->B;}
@@ -56,7 +61,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the third neighbor
 	k = image_col*(row - 1) + col + 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[2].R = (images_1+k)->R;
 		neighbor[2].G = (images_1+k)->G;
 		neighbor[2].B = (images_1+k)->B;}
@@ -67,7 +72,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the fourth neighbor
 	k = image_col*row + col - 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[3].R = (images_1+k)->R;
 		neighbor[3].G = (images_1+k)->G;
 		neighbor[3].B = (images_1+k)->B;}
@@ -78,7 +83,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the fifth neighbor
 	k = image_col*row + col + 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[4].R = (images_1+k)->R;
 		neighbor[4].G = (images_1+k)->G;
 		neighbor[4].B = (images_1+k)->B;}
@@ -89,7 +94,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the sixth neighbor
 	k = image_col*(row + 1) + col - 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[5].R = (images_1+k)->R;
 		neighbor[5].G = (images_1+k)->G;
 		neighbor[5].B = (images_1+k)->B;}
@@ -100,7 +105,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	 }
 	//the seventh neighbor
 	k = image_col*(row + 1) + col;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[6].R = (images_1+k)->R;
 		neighbor[6].G = (images_1+k)->G;
 		neighbor[6].B = (images_1+k)->B;}
@@ -111,7 +116,7 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//the eighth neighbor
 	k = image_col*(row + 1) + col + 1;
-	if(k >= 0) {
+	if(k >= 0 && k < sum) {
 		neighbor[7].R = (images_1+k)->R;
 		neighbor[7].G = (images_1+k)->G;
 		neighbor[7].B = (images_1+k)->B;}
@@ -120,11 +125,11 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		neighbor[7].G = 0;
 		neighbor[7].B = 0;
 	}
+//	printf("neighbor[7].R of row = %d,col = %d is %d\n",row,col,neighbor[7].R);
 	//iterate the neighbor[] to calculate the sum of neighbor
-	
 	//generate the color
 	int R_new = 0, G_new = 0, B_new = 0;
-	int R_sum[8] = {}, G_sum[8] = {}, B_sum[8] = {};
+	int R_sum[8] = {0}, G_sum[8] = {0}, B_sum[8] = {0};
 	for(int i = 0; i < 8; i++) {
 		for(int j = 0; j < 8; j++) {
 			R_sum[i] = ((neighbor[j].R >> i)&1) + R_sum[i];
@@ -134,14 +139,14 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 	}
 	//R
 	for(int i = 0; i < 8; i++) {
-		if(((R>>i)&1) == 1 && ((rule>>(9+R_sum[i])&1) == 1)) {
+		if((((R>>i)&1) == 1) && ((rule>>(9+R_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
 			for(int j = 0; j < i; j++) {
 				p = p * q;
 			}
 			R_new = R_new | p;
 			}
-		else if(((R>>i)&1) == 0 && (((rule>>R_sum[i])&1) == 1)) {
+		else if((((R>>i)&1) == 0) && (((rule>>R_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
                         for(int j = 0; j < i; j++) {
                                 p = p * q;
@@ -154,14 +159,14 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		}
 	//G
 	for(int i = 0; i < 8; i++) {
-		if(((G>>i)&1) == 1 && ((rule>>(9+G_sum[i])&1) == 1)) {
+		if((((G>>i)&1) == 1) && ((rule>>(9+G_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
                         for(int j = 0; j < i; j++) {
                                 p = p * q;
                         }
 			G_new = G_new | p;
 			}
-		else if(((G>>i)&1) == 0 && (((rule>>G_sum[i])&1) == 1)) {
+		else if((((G>>i)&1) == 0) && (((rule>>G_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
                         for(int j = 0; j < i; j++) {
                                 p = p * q;
@@ -174,14 +179,14 @@ Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 		}
 	//B
 	for(int i = 0; i < 8; i++) {
-		if(((B>>i)&1) == 1 && ((rule>>(9+B_sum[i])&1) == 1)) {
+		if((((B>>i)&1) == 1) && ((rule>>(9+B_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
                         for(int j = 0; j < i; j++) {
                                 p = p * q;
                         }
 			B_new = B_new | p;
 			}
-		else if(((B>>i)&1) == 0 && (((rule>>B_sum[i])&1) == 1)) {
+		else if((((B>>i)&1) == 0) && (((rule>>B_sum[i])&1) == 1)) {
 			int p = 1, q = 2;
                         for(int j = 0; j < i; j++) {
                                 p = p * q;
@@ -217,6 +222,7 @@ Image *life(Image *image, uint32_t rule)
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {
 			Color *color = evaluateOneCell(images, i, j, rule);
+//			printf("this is i=%d j=%dcolor R = %d,G = %d,B = %d\n",i,j,color->R, color->G, color->B);
 			color_star = &color;
 //			*color_star += 1;
 			new_color[k] = *color;
@@ -252,12 +258,12 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	Image *image = readData(argv[1]);
-	char *example;
-	int num = strtol(argv[2], &example, 0);
-	Image *image_new = life(image, num);
-	writeData(image_new);
-	freeImage(image);
-	freeImage(image_new);
+//	char *example;
+//	int num = strtol(argv[2], &example, 0);
+//	Image *image_new = life(image, num);
+	writeData(image);
+//	freeImage(image);
+//	freeImage(image_new);
 	return 0;
 
 }
